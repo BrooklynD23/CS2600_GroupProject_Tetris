@@ -2,77 +2,246 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 // Creating block structure
 #define block_size 4
 
 struct Block
 {
-    char shape[block_size][block_size];
-    int width;
-    int height;
+    char shapes[4][block_size][block_size];
+    int widths[4];
+    int heights[4];
 };
 
 // Global Variables for the block types
 //
-struct Block blocks[7] =
-{
-    // Horizontal I
-    {{
-        {'X', 'X', 'X', 'X'},
-        {' ', ' ', ' ', ' '},
-        {' ', ' ', ' ', ' '},
-        {' ', ' ', ' ', ' '}
-    }, 4, 1},
+struct Block blocks[7] = {
+    // I
+    {
+        .shapes = {
+            {
+                {'X','X','X','X'},
+                {' ',' ',' ',' '},
+                {' ',' ',' ',' '},
+                {' ',' ',' ',' '}
+            },
+            {
+                {' ','X',' ',' '},
+                {' ','X',' ',' '},
+                {' ','X',' ',' '},
+                {' ','X',' ',' '}
+            },
+            {
+                {'X','X','X','X'},
+                {' ',' ',' ',' '},
+                {' ',' ',' ',' '},
+                {' ',' ',' ',' '}
+            },
+            {
+                {' ','X',' ',' '},
+                {' ','X',' ',' '},
+                {' ','X',' ',' '},
+                {' ','X',' ',' '}
+            }
+        },
+        .widths = {4, 1, 4, 1},
+        .heights = {1, 4, 1, 4}
+    },
 
     // T
-    {{
-        {'X', 'X', 'X', ' '},
-        {' ', 'X', ' ', ' '},
-        {' ', ' ', ' ', ' '},
-        {' ', ' ', ' ', ' '}
-    }, 3, 2},
+    {
+        .shapes = {
+            {
+                {'X','X','X',' '},
+                {' ','X',' ',' '},
+                {' ',' ',' ',' '},
+                {' ',' ',' ',' '}
+            },
+            {
+                {' ','X',' ',' '},
+                {'X','X',' ',' '},
+                {' ','X',' ',' '},
+                {' ',' ',' ',' '}
+            },
+            {
+                {' ','X',' ',' '},
+                {'X','X','X',' '},
+                {' ',' ',' ',' '},
+                {' ',' ',' ',' '}
+            },
+            {
+                {' ','X',' ',' '},
+                {' ','X','X',' '},
+                {' ','X',' ',' '},
+                {' ',' ',' ',' '}
+            }
+        },
+        .widths = {3, 2, 3, 2},
+        .heights = {2, 3, 2, 3}
+    },
 
     // O
-    {{
-        {'X', 'X', ' ', ' '},
-        {'X', 'X', ' ', ' '},
-        {' ', ' ', ' ', ' '},
-        {' ', ' ', ' ', ' '}
-    }, 2, 2},
+    {
+        .shapes = {
+            {
+                {' ','X','X',' '},
+                {' ','X','X',' '},
+                {' ',' ',' ',' '},
+                {' ',' ',' ',' '}
+            },
+            {
+                {' ','X','X',' '},
+                {' ','X','X',' '},
+                {' ',' ',' ',' '},
+                {' ',' ',' ',' '}
+            },
+            {
+                {' ','X','X',' '},
+                {' ','X','X',' '},
+                {' ',' ',' ',' '},
+                {' ',' ',' ',' '}
+            },
+            {
+                {' ','X','X',' '},
+                {' ','X','X',' '},
+                {' ',' ',' ',' '},
+                {' ',' ',' ',' '}
+            }
+        },
+        .widths = {2, 2, 2, 2},
+        .heights = {2, 2, 2, 2}
+    },
 
     // S
-    {{
-        {' ', 'X', 'X', ' '},
-        {'X', 'X', ' ', ' '},
-        {' ', ' ', ' ', ' '},
-        {' ', ' ', ' ', ' '}
-    }, 3, 2},
-
-    // L
-    {{
-        {'X', ' ', ' ', ' '},
-        {'X', 'X', 'X', ' '},
-        {' ', ' ', ' ', ' '},
-        {' ', ' ', ' ', ' '}
-    }, 3, 2},
-
-    // J
-    {{
-        {' ', ' ', 'X', ' '},
-        {'X', 'X', 'X', ' '},
-        {' ', ' ', ' ', ' '},
-        {' ', ' ', ' ', ' '}
-    }, 3, 2},
+    {
+        .shapes = {
+            {
+                {' ','X','X',' '},
+                {'X','X',' ',' '},
+                {' ',' ',' ',' '},
+                {' ',' ',' ',' '}
+            },
+            {
+                {'X',' ',' ' ,' '},
+                {'X','X',' ' ,' '},
+                {' ','X',' ' ,' '},
+                {' ',' ',' ',' '}
+            },
+            {
+                {' ','X','X',' '},
+                {'X','X',' ',' '},
+                {' ',' ',' ',' '},
+                {' ',' ',' ',' '}
+            },
+            {
+                {'X',' ',' ' ,' '},
+                {'X','X',' ' ,' '},
+                {' ','X',' ' ,' '},
+                {' ',' ',' ',' '}
+            }
+        },
+        .widths = {3, 2, 3, 2},
+        .heights = {2, 3, 2, 3}
+    },
 
     // Z
-    {{
-        {'X', 'X', ' ', ' '},
-        {' ', 'X', 'X', ' '},
-        {' ', ' ', ' ', ' '},
-        {' ', ' ', ' ', ' '}
-    }, 3, 2}
+    {
+        .shapes = {
+            {
+                {'X','X',' ',' '},
+                {' ','X','X',' '},
+                {' ',' ',' ',' '},
+                {' ',' ',' ',' '}
+            },
+            {
+                {' ','X',' ' ,' '},
+                {'X','X',' ' ,' '},
+                {'X',' ',' ' ,' '},
+                {' ',' ',' ',' '}
+            },
+            {
+                {'X','X',' ',' '},
+                {' ','X','X',' '},
+                {' ',' ',' ',' '},
+                {' ',' ',' ',' '}
+            },
+            {
+                {' ','X',' ' ,' '},
+                {'X','X',' ' ,' '},
+                {'X',' ',' ' ,' '},
+                {' ',' ',' ',' '}
+            }
+        },
+        .widths = {3, 2, 3, 2},
+        .heights = {2, 3, 2, 3}
+    },
+
+    // J
+    {
+        .shapes = {
+            {
+                {'X','X','X',' '},
+                {' ',' ','X',' '},
+                {' ',' ',' ',' '},
+                {' ',' ',' ',' '}
+            },
+            {
+                {' ','X',' ' ,' '},
+                {' ','X',' ' ,' '},
+                {'X','X',' ' ,' '},
+                {' ',' ',' ',' '}
+            },
+            {
+                {'X',' ',' ',' '},
+                {'X','X','X',' '},
+                {' ',' ',' ',' '},
+                {' ',' ',' ',' '}
+            },
+            {
+                {'X','X',' ' ,' '},
+                {'X',' ',' ' ,' '},
+                {'X',' ',' ' ,' '},
+                {' ',' ',' ',' '}
+            }
+        },
+        .widths = {3, 2, 3, 2},
+        .heights = {2, 3, 2, 3}
+    },
+
+    // L
+    {
+        .shapes = {
+            {
+                {'X','X','X',' '},
+                {'X',' ',' ',' '},
+                {' ',' ',' ',' '},
+                {' ',' ',' ',' '}
+            },
+            {
+                {'X','X',' ' ,' '},
+                {' ','X',' ' ,' '},
+                {' ','X',' ' ,' '},
+                {' ',' ',' ',' '}
+            },
+            {
+                {' ',' ','X',' '},
+                {'X','X','X',' '},
+                {' ',' ',' ',' '},
+                {' ',' ',' ',' '}
+            },
+            {
+                {'X',' ',' ' ,' '},
+                {'X',' ' ,' ' ,' '},
+                {'X','X',' ' ,' '},
+                {' ',' ',' ',' '}
+            }
+        },
+        .widths = {3, 2, 3, 2},
+        .heights = {2, 3, 2, 3}
+    }
 };
+
 
 // Structure to represent the currently active Tetris piece
 struct currentPiece
@@ -86,14 +255,63 @@ struct currentPiece
 
 
 // ------------------------------------------------------- Work in Progress ------------------------------------------------------- //
+struct GameState {
+    char gameBoard[20][10];
+    struct currentPiece activePiece;
+    int score;
+    int level;
+    int gameOver;
+};
+
+void initializeGameBoard(char gameBoard[20][10]);
+void spawnNewPiece(struct GameState *state);
+int validPosition(char gameBoard[20][10], int blockIndex, int rotation, int row, int col);
+
+
 // All game functions will be defined here as needed
 // Initializes the overall game state (score, level, board, first piece)
-// void initializeGame(struct GameState *state); // Example - Assuming GameState struct exists elsewhere
+void initializeGame(struct GameState *state) {// Example - Assuming GameState struct exists elsewhere
+    state->score = 0;
+    state->level = 1;
+    state->gameOver = 0;
+
+    initializeGameBoard(state->gameBoard);
+    spawnNewPiece(state);
+}
 
 // spawn new block pieces
 // Selects a new random block and places it at the top center of the board.
 // Updates the activePiece in the GameState. Returns false if spawn fails (game over).
-// void spawnNewPiece(struct GameState *state); // Example
+void spawnNewPiece(struct GameState *state) {
+    int index = rand() % 7;
+    int rotation = 0;
+
+    state->activePiece.blockIndex = index;
+    state->activePiece.rotation = rotation;
+    state->activePiece.row = 0;
+    state->activePiece.col = (10 - blocks[index].widths[rotation]) / 2;
+
+    if (!validPosition(state->gameBoard, index, rotation,
+                       state->activePiece.row, state->activePiece.col)) {
+        printf("Game Over!\n");
+        state->gameOver = 1;
+                       }
+}
+
+int validPosition(char gameBoard[20][10],int blockIndex, int rotation, int row, int col) {
+    for (int i = 0; i < blocks[blockIndex].heights[rotation]; i++) {
+        for (int j = 0; j < blocks[blockIndex].widths[rotation]; j++) {
+            if (blocks[blockIndex].shapes[rotation][i][j] == 'X') {
+                int r = row + i;
+                int c = col + j;
+
+                if (r >= 20 || c < 0 || c >= 10) return 0;
+                if (gameBoard[r][c] == 'X') return 0;
+            }
+        }
+    }
+    return 1;
+}
 
 // Block Representation & Rotation
 // Gets the specific shape definition for a given block type and rotation.
@@ -121,7 +339,7 @@ void displayGameBoard(char gameBoard[20][10]);
 
 // Displays a single Tetris block shape to the console (for debugging/example).
 // Takes a 'struct Block' as input.
-void displayBlock(struct Block b);
+void displayBlock(struct Block b, int rotation);
 
 // **** NEED TO ADD DIFFERENT USER MOVEMENT FUNCTIONS ****
 // LEFT,RIGHT, DOWN, ROTATE, DROP
@@ -131,6 +349,9 @@ void displayBlock(struct Block b);
 // We will call the other functions from here as needed to run the game
 int main()
 {
+
+    srand(time(NULL));
+
      // --- Game Loop Placeholder ---
     // This is where the main logic of the game will reside:
     // 1. Spawning new blocks
@@ -155,8 +376,13 @@ int main()
     initializeGameBoard(gameBoard);
     displayGameBoard(gameBoard);
 
+    //will delete later, just making sure we are printing the correct shapes
     printf("\n Example I block:\n");
-    displayBlock(blocks[0]); // Display the first block (I piece) as an example
+    displayBlock(blocks[0], 0);
+    displayBlock(blocks[0], 1);
+    displayBlock(blocks[0], 2);
+    displayBlock(blocks[0], 3);
+    // Display the first block (I piece) as an example
 
     // Game loop goes here.
 
@@ -197,23 +423,11 @@ void displayGameBoard(char gameBoard[20][10])
         printf("\n");
     }
 }
-
-void displayBlock(struct Block b)
-{
-    for (int i = 0; i < b.height; i++)
-    {
-        for (int j = 0; j < b.width; j++)
-        {
-            // Only print 'X' for block parts, use '.' or ' ' for empty parts within its grid
-            if (b.shape[i][j] == 'X')
-            {
-                printf("X ");
-            }
-            else
-            {
-                // Using '.' consistent with the game board empty cell representation
-                printf(". ");
-            }
+//Will delete later, just making sure we are printing the correct shapes
+void displayBlock(struct Block b, int rotation) {
+    for (int i = 0; i < block_size; i++) {
+        for (int j = 0; j < block_size; j++) {
+            printf("%c ", b.shapes[rotation][i][j] == 'X' ? 'X' : '.');
         }
         printf("\n");
     }
