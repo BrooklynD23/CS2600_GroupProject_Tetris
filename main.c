@@ -264,13 +264,13 @@ struct GameState {
 };
 
 void initializeGameBoard(char gameBoard[20][10]);
-void spawnNewPiece(struct GameState *state);
+void spawnNewPiece(struct GameState *gameState);
 int validPosition(char gameBoard[20][10], int blockIndex, int rotation, int row, int col);
 
 
 // All game functions will be defined here as needed
 // Initializes the overall game state (score, level, board, first piece)
-void initializeGame(struct GameState *state) {// Example - Assuming GameState struct exists elsewhere
+void initializeGame(struct GameState *gameState) {// Example - Assuming GameState struct exists elsewhere
     state->score = 0;
     state->level = 1;
     state->gameOver = 0;
@@ -317,6 +317,7 @@ int validPosition(char gameBoard[20][10],int blockIndex, int rotation, int row, 
 // Gets the specific shape definition for a given block type and rotation.
 // (This is crucial - the 'blocks' array only holds one rotation)
 // struct Block getRotatedBlock(int blockIndex, int rotation); // Example
+
 // Rotates the current active piece (if valid).
 // void rotatePiece(struct GameState *state); // Example
 
@@ -324,7 +325,24 @@ int validPosition(char gameBoard[20][10],int blockIndex, int rotation, int row, 
 // Checks if the active piece is in a valid position on the board.
 // Considers board boundaries and collisions with existing locked blocks.
 // Takes potential new row, col, and the block shape to check.
-// bool isValidPosition(const struct GameState *state, const struct Block *piece, int newRow, int newCol); // Example
+bool isValidPosition(const struct GameState *gameState, const struct Block *piece, int newRow, int newCol) {
+    // Check for boundaries
+    if (newCol < 0 || newCol >= 10 || newRow < 0 || newRow >= 20) {
+    return false;
+    }
+
+    // Check for collision with existing blocks on the game board
+    for (int row = 0; row < 4; row++) {
+        for (int col = 0; col < 4; col++) {
+            if (piece->shape[row][col] != ' ') {
+                if (gameState->gameBoard[newRow + row][newCol + col] != '.') {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+} // Example
 
 // Print the rules of the game to console for user's direction
 void printGameRules();
@@ -343,13 +361,78 @@ void displayBlock(struct Block b, int rotation);
 
 // **** NEED TO ADD DIFFERENT USER MOVEMENT FUNCTIONS ****
 // LEFT,RIGHT, DOWN, ROTATE, DROP
+// Examples
+void moveLeft(struct GameState *gameState) {
+    if (validPosition(gameState->gameBoard, gameState->activePiece.blockIndex, 
+                     gameState->activePiece.rotation, 
+                     gameState->activePiece.row, 
+                     gameState->activePiece.col - 1)) {
+        gameState->activePiece.col--;
+    }
+}
+
+void moveRight(struct GameState *gameState) {
+    if (validPosition(gameState->gameBoard, gameState->activePiece.blockIndex, 
+                     gameState->activePiece.rotation, 
+                     gameState->activePiece.row, 
+                     gameState->activePiece.col + 1)) {
+        gameState->activePiece.col++;
+    }
+}
+
+void moveDown(struct GameState *gameState) {
+    if (validPosition(gameState->gameBoard, gameState->activePiece.blockIndex, 
+                     gameState->activePiece.rotation, 
+                     gameState->activePiece.row + 1, 
+                     gameState->activePiece.col)) {
+        gameState->activePiece.row++;
+    } else {
+        // Lock the piece in place and spawn a new one
+        for (int i = 0; i < blocks[gameState->activePiece.blockIndex].heights[gameState->activePiece.rotation]; i++) {
+            for (int j = 0; j < blocks[gameState->activePiece.blockIndex].widths[gameState->activePiece.rotation]; j++) {
+                if (blocks[gameState->activePiece.blockIndex].shapes[gameState->activePiece.rotation][i][j] == 'X') {
+                    gameState->gameBoard[gameState->activePiece.row + i][gameState->activePiece.col + j] = 'X';
+                }
+            }
+        }
+        spawnNewPiece(gameState);
+    }
+}
+
+void rotate(struct GameState *gameState) {
+    int newRotation = (gameState->activePiece.rotation + 1) % 4;
+    
+    if (validPosition(gameState->gameBoard, gameState->activePiece.blockIndex, 
+                     newRotation, 
+                     gameState->activePiece.row, 
+                     gameState->activePiece.col)) {
+        gameState->activePiece.rotation = newRotation;
+    }
+}
+
+void drop(struct GameState *gameState) {
+    while (validPosition(gameState->gameBoard, gameState->activePiece.blockIndex, 
+                        gameState->activePiece.rotation, 
+                        gameState->activePiece.row + 1, 
+                        gameState->activePiece.col)) {
+        gameState->activePiece.row++;
+    }
+
+    for (int i = 0; i < blocks[gameState->activePiece.blockIndex].heights[gameState->activePiece.rotation]; i++) {
+        for (int j = 0; j < blocks[gameState->activePiece.blockIndex].widths[gameState->activePiece.rotation]; j++) {
+            if (blocks[gameState->activePiece.blockIndex].shapes[gameState->activePiece.rotation][i][j] == 'X') {
+                gameState->gameBoard[gameState->activePiece.row + i][gameState->activePiece.col + j] = 'X';
+            }
+        }
+    }
+    spawnNewPiece(gameState);
+}  
 // ------------------------------------------------------- Work in Progress ------------------------------------------------------- //
 
 // main function - driver function for the game
 // We will call the other functions from here as needed to run the game
 int main()
 {
-
     srand(time(NULL));
 
      // --- Game Loop Placeholder ---
@@ -401,6 +484,10 @@ void printGameRules()
     printf("Rule #2. Press 'q' to quit the game at any time.\n");
     printf("Rule #3. Once a line has been filled in with tetris blocks, that line will be cleared from the board.\n");
     printf("Rule #4: The game ends when any block reaches the top of the board.\n\n");
+    printf("Good luck and have fun!\n\n");
+    printf("Press any key to continue...\n");
+    getchar(); // Wait for user input to continue
+    printf("\n\n");
 }
 
 // Renamed from initializeBoard (main) to initializeGameBoard (Testing) for consistency
