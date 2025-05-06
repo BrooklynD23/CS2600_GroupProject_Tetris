@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <time.h>
 
+
 // Creating block structure
 #define block_size 4
 
@@ -271,12 +272,12 @@ int validPosition(char gameBoard[20][10], int blockIndex, int rotation, int row,
 // All game functions will be defined here as needed
 // Initializes the overall game state (score, level, board, first piece)
 void initializeGame(struct GameState *gameState) {// Example - Assuming GameState struct exists elsewhere
-    state->score = 0;
-    state->level = 1;
-    state->gameOver = 0;
+    gameState->score = 0;
+    gameState->level = 1;
+    gameState->gameOver = 0;
 
-    initializeGameBoard(state->gameBoard);
-    spawnNewPiece(state);
+    initializeGameBoard(gameState->gameBoard);
+    spawnNewPiece(gameState);
 }
 
 // spawn new block pieces
@@ -298,6 +299,10 @@ void spawnNewPiece(struct GameState *state) {
                        }
 }
 
+// --- Collision Detection ---
+// Checks if the active piece is in a valid position on the board.
+// Considers board boundaries and collisions with existing locked blocks.
+// Takes potential new row, col, and the block shape to check.
 int validPosition(char gameBoard[20][10],int blockIndex, int rotation, int row, int col) {
     for (int i = 0; i < blocks[blockIndex].heights[rotation]; i++) {
         for (int j = 0; j < blocks[blockIndex].widths[rotation]; j++) {
@@ -314,35 +319,10 @@ int validPosition(char gameBoard[20][10],int blockIndex, int rotation, int row, 
 }
 
 // Block Representation & Rotation
-// Gets the specific shape definition for a given block type and rotation.
-// (This is crucial - the 'blocks' array only holds one rotation)
-// struct Block getRotatedBlock(int blockIndex, int rotation); // Example
+
 
 // Rotates the current active piece (if valid).
 // void rotatePiece(struct GameState *state); // Example
-
-// --- Collision Detection ---
-// Checks if the active piece is in a valid position on the board.
-// Considers board boundaries and collisions with existing locked blocks.
-// Takes potential new row, col, and the block shape to check.
-bool isValidPosition(const struct GameState *gameState, const struct Block *piece, int newRow, int newCol) {
-    // Check for boundaries
-    if (newCol < 0 || newCol >= 10 || newRow < 0 || newRow >= 20) {
-    return false;
-    }
-
-    // Check for collision with existing blocks on the game board
-    for (int row = 0; row < 4; row++) {
-        for (int col = 0; col < 4; col++) {
-            if (piece->shape[row][col] != ' ') {
-                if (gameState->gameBoard[newRow + row][newCol + col] != '.') {
-                    return false;
-                }
-            }
-        }
-    }
-    return true;
-} // Example
 
 // Print the rules of the game to console for user's direction
 void printGameRules();
@@ -363,27 +343,27 @@ void displayBlock(struct Block b, int rotation);
 // LEFT,RIGHT, DOWN, ROTATE, DROP
 // Examples
 void moveLeft(struct GameState *gameState) {
-    if (validPosition(gameState->gameBoard, gameState->activePiece.blockIndex, 
-                     gameState->activePiece.rotation, 
-                     gameState->activePiece.row, 
+    if (validPosition(gameState->gameBoard, gameState->activePiece.blockIndex,
+                     gameState->activePiece.rotation,
+                     gameState->activePiece.row,
                      gameState->activePiece.col - 1)) {
         gameState->activePiece.col--;
     }
 }
 
 void moveRight(struct GameState *gameState) {
-    if (validPosition(gameState->gameBoard, gameState->activePiece.blockIndex, 
-                     gameState->activePiece.rotation, 
-                     gameState->activePiece.row, 
+    if (validPosition(gameState->gameBoard, gameState->activePiece.blockIndex,
+                     gameState->activePiece.rotation,
+                     gameState->activePiece.row,
                      gameState->activePiece.col + 1)) {
         gameState->activePiece.col++;
     }
 }
 
 void moveDown(struct GameState *gameState) {
-    if (validPosition(gameState->gameBoard, gameState->activePiece.blockIndex, 
-                     gameState->activePiece.rotation, 
-                     gameState->activePiece.row + 1, 
+    if (validPosition(gameState->gameBoard, gameState->activePiece.blockIndex,
+                     gameState->activePiece.rotation,
+                     gameState->activePiece.row + 1,
                      gameState->activePiece.col)) {
         gameState->activePiece.row++;
     } else {
@@ -401,19 +381,19 @@ void moveDown(struct GameState *gameState) {
 
 void rotate(struct GameState *gameState) {
     int newRotation = (gameState->activePiece.rotation + 1) % 4;
-    
-    if (validPosition(gameState->gameBoard, gameState->activePiece.blockIndex, 
-                     newRotation, 
-                     gameState->activePiece.row, 
+
+    if (validPosition(gameState->gameBoard, gameState->activePiece.blockIndex,
+                     newRotation,
+                     gameState->activePiece.row,
                      gameState->activePiece.col)) {
         gameState->activePiece.rotation = newRotation;
     }
 }
 
 void drop(struct GameState *gameState) {
-    while (validPosition(gameState->gameBoard, gameState->activePiece.blockIndex, 
-                        gameState->activePiece.rotation, 
-                        gameState->activePiece.row + 1, 
+    while (validPosition(gameState->gameBoard, gameState->activePiece.blockIndex,
+                        gameState->activePiece.rotation,
+                        gameState->activePiece.row + 1,
                         gameState->activePiece.col)) {
         gameState->activePiece.row++;
     }
@@ -426,7 +406,7 @@ void drop(struct GameState *gameState) {
         }
     }
     spawnNewPiece(gameState);
-}  
+}
 // ------------------------------------------------------- Work in Progress ------------------------------------------------------- //
 
 // main function - driver function for the game
