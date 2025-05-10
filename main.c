@@ -419,22 +419,13 @@ void drop(struct GameState *gameState) {
 // We will call the other functions from here as needed to run the game
 int main()
 {
-    srand(time(NULL));
+    srand(time(NULL)); // Seed the random number generator for random block generation
 
-     // --- Game Loop Placeholder ---
-    // This is where the main logic of the game will reside:
-    // 1. Spawning new blocks
-    // 2. Handling user input (moving/rotating blocks)
-    // 3. Automatically moving the block down
-    // 4. Checking for collisions
-    // 5. Locking blocks in place
-    // 6. Checking for and clearing completed lines
-    // 7. Updating the score
-    // 8. Checking for game over condition
-    // 9. Updating the display
-    // This loop will continue until the game over condition is met or the user quits.
+    // Initialize the game state (board, score, level, first block)
+    struct GameState gameState;
+    initializeGame(&gameState);
 
-    printf("Hello Player! Welcome to Tetris!\n");
+        printf("Hello PLAYERS! Welcome to Tetris!\n");
 
     printGameRules();
 
@@ -445,7 +436,7 @@ int main()
     initializeGameBoard(gameBoard);
     displayGameBoard(gameBoard);
 
-    //will delete later, just making sure we are printing the correct shapes
+    // Will delete later, just making sure we are printing the correct shapes
     printf("\n Example I block:\n");
     displayBlock(blocks[0], 0);
     displayBlock(blocks[0], 1);
@@ -453,12 +444,42 @@ int main()
     displayBlock(blocks[0], 3);
     // Display the first block (I piece) as an example
 
-    // Game loop goes here.
+    // ----------------------------- MAIN GAME LOOP -----------------------------
+    while (!gameState.gameOver) {
+
+        // --------- INPUT HANDLING SECTION ---------
+        if (_kbhit()) { // Check if a key has been pressed (non-blocking)
+            char input = _getch(); // Read the pressed key without waiting for Enter
+
+            // Handle each key's action
+            switch (input) {
+                case 'a': moveLeft(&gameState); break;    // Move piece left
+                case 'd': moveRight(&gameState); break;   // Move piece right
+                case 's': moveDown(&gameState); break;    // Move piece down by one
+                case 'w': rotate(&gameState); break;      // Rotate the piece
+                case ' ': drop(&gameState); break;        // Instantly drop the piece
+                case 'q': gameState.gameOver = 1; break;  // Quit the game
+            }
+
+            // Refresh the screen to show updated board after user input
+            clearScreen();
+            displayGameBoard(gameState.gameBoard);
+        }
+
+        // --------- GRAVITY TICK SECTION ---------
+        static int tick = 0;           // Simple counter to simulate time delay
+        if (++tick % 100000 == 0) {    // Every 100000 ticks, move the piece down
+            moveDown(&gameState);      // Try to move down; if blocked, piece locks
+            clearScreen();             // Clear terminal screen before next draw
+            displayGameBoard(gameState.gameBoard); // Redraw board with updates
+        }
+    }
+    // ----------------------------- END GAME LOOP -----------------------------
 
     // Game Over & Summary of User's Score
     printf("\n--- GAME OVER ---\n");
-    // printf("Final Score: %d\n", gameState.score);  <- Need to set-up gameState struct
-    // printf("Final Level: %d\n", gameState.level);
+    printf("Final Score: %d\n", gameState.score);
+    printf("Final Level: %d\n", gameState.level);
 
     return 0;
 }
