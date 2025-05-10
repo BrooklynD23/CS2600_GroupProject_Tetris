@@ -339,6 +339,10 @@ void displayGameBoard(char gameBoard[20][10]);
 // Takes a 'struct Block' as input.
 void displayBlock(struct Block b, int rotation);
 
+// Clears full lines in the game board and shifts the rows down.
+// Returns the number of lines cleared.
+int clearLines(char gameBoard[20][10]);
+
 // **** NEED TO ADD DIFFERENT USER MOVEMENT FUNCTIONS ****
 // LEFT,RIGHT, DOWN, ROTATE, DROP
 // Examples
@@ -375,6 +379,7 @@ void moveDown(struct GameState *gameState) {
                 }
             }
         }
+        clearLines(gameState->gameBoard);
         spawnNewPiece(gameState);
     }
 }
@@ -405,6 +410,7 @@ void drop(struct GameState *gameState) {
             }
         }
     }
+    clearLines(gameState->gameBoard);
     spawnNewPiece(gameState);
 }
 // ------------------------------------------------------- Work in Progress ------------------------------------------------------- //
@@ -498,4 +504,38 @@ void displayBlock(struct Block b, int rotation) {
         }
         printf("\n");
     }
+}
+
+int clearLines(char gameBoard[20][10]) {
+    int linesCleared = 0;
+
+    for (int row = 19; row >= 0; row--) {
+        int isFull = 1;
+
+        for (int col = 0; col < 10; col++) {
+            if (gameBoard[row][col] != 'X') {
+                isFull = 0;
+                break;
+            }
+        }
+
+        if (!isFull) {
+            continue;
+        }
+
+        for (int i = row; i > 0; i--) {
+            for (int col = 0; col < 10; col++) {
+                gameBoard[i][col] = gameBoard[i-1][col];
+            }
+        }
+
+        for (int col = 0; col < 10; col++) {
+            gameBoard[0][col] = '.';
+        }
+
+        linesCleared++;
+        row++;
+    }
+
+    return linesCleared;
 }
