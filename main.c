@@ -413,6 +413,10 @@ void drop(struct GameState *gameState) {
     clearLines(gameState->gameBoard);
     spawnNewPiece(gameState);
 }
+
+void clearScreen() {
+    system("clear");
+}
 // ------------------------------------------------------- Work in Progress ------------------------------------------------------- //
 
 // main function - driver function for the game
@@ -556,6 +560,11 @@ int clearLines(char gameBoard[20][10]) {
 
         linesCleared++;
         row++;
+    }
+
+    if (linesCleared > 0) {
+        clearScreen();
+        displayGameBoard(gameBoard);
     }
 
     return linesCleared;
